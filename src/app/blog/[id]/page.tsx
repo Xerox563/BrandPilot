@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useRef } from "react";
+import BlogAdminEditor from "./BlogAdminEditor";
 
 interface Blog {
   _id: string;
@@ -51,6 +52,7 @@ export default function BlogPage() {
   const [error, setError] = useState("");
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [isEditMode, setIsEditMode] = useState(false);
   const { data: session } = useSession();
   const [comments, setComments] = useState<any[]>([]);
   const [commentInput, setCommentInput] = useState("");
@@ -81,6 +83,8 @@ export default function BlogPage() {
       }
       const data = await response.json();
       console.log('Fetched blog data:', data);
+      console.log('Blog content:', data.content);
+      console.log('Blog content type:', typeof data.content);
       setBlog(data);
       setLikeCount(data.likes || 0);
       // Check if current user has liked this blog
@@ -216,6 +220,20 @@ export default function BlogPage() {
     }
   };
 
+  const handleAdminSave = async (newContent: string) => {
+    if (!blog) return;
+    const res = await fetch(`/api/blogs/${blog._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: newContent }),
+    });
+    if (res.ok) {
+      // Update the local blog state with new content instead of refetching
+      setBlog(prevBlog => prevBlog ? { ...prevBlog, content: newContent } : null);
+      // Keep edit mode active - don't call fetchBlog() which would reset the page
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -301,9 +319,19 @@ export default function BlogPage() {
         <article className="bg-white rounded-xl shadow-lg overflow-hidden">
           {/* Blog Header */}
           <div className="p-8 border-b">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
-              {displayTitle}
-            </h1>
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-4xl font-bold text-gray-900 leading-tight">
+                {displayTitle}
+              </h1>
+              {session?.user?.id === blog.author?._id && (
+                <button
+                  onClick={() => setIsEditMode(!isEditMode)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                >
+                  {isEditMode ? 'Cancel Edit' : 'Edit Blog'}
+                </button>
+              )}
+            </div>
             
             {/* Author Info */}
             <div className="flex items-center space-x-4 mb-6">
@@ -409,14 +437,22 @@ export default function BlogPage() {
 
           {/* Blog Content */}
           <div className="p-8">
-            <div className="prose prose-lg max-w-none">
-              {/* Split content into paragraphs */}
-              {displayContent.split('\n\n').map((paragraph, index) => (
-                <p key={index} className="mb-6 text-gray-700 leading-relaxed">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+            {isEditMode && session?.user?.id === blog.author?._id ? (
+              <BlogAdminEditor
+                initialContent={blog.content}
+                onSave={handleAdminSave}
+                isAdmin={true}
+              />
+            ) : (
+              <div className="prose prose-lg max-w-none">
+                {/* Split content into paragraphs */}
+                {displayContent.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="mb-6 text-gray-700 leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Comments Section */}
@@ -457,9 +493,6 @@ export default function BlogPage() {
               ))}
             </div>
           </div>
-
-          {/* Admin Editor Placeholder */}
-          {/* TODO: Add rich text editor for admin here */}
 
           {/* Footer */}
           <div className="p-8 bg-gray-50 border-t">
