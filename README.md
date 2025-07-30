@@ -17,6 +17,7 @@ BrandPilot is a full-featured blog creation platform powered by Google Gemini AI
 
 ## Features to be Addon ::
 - **Viewer Count** Curently Working on this , to know number of users read the blog .
+- **huggingface  **
 - **Linkedin Working Flow Integration:** Where users can directly share the article/blog as the post on the linkedin (Linkedin Automation)
 - **Theme Customization** Where users can customize the theme as well as the colors.
 - **Editor Menu** Where users can access the editor menu to edit the article more greatly.
