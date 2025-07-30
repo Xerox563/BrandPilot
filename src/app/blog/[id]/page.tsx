@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useRef } from "react";
 
 interface Blog {
   _id: string;
@@ -49,6 +51,11 @@ export default function BlogPage() {
   const [error, setError] = useState("");
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const { data: session } = useSession();
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentInput, setCommentInput] = useState("");
+  const [commentLoading, setCommentLoading] = useState(false);
+  const commentInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchBlog();
@@ -61,6 +68,10 @@ export default function BlogPage() {
       setTranslatedContent(null);
     }
   }, [selectedLanguage, blog]);
+
+  useEffect(() => {
+    if (blog) fetchComments();
+  }, [blog]);
 
   const fetchBlog = async () => {
     try {
@@ -171,6 +182,37 @@ export default function BlogPage() {
     } catch (error) {
       console.error('Error liking blog:', error);
       setError('Failed to like blog');
+    }
+  };
+
+  const fetchComments = async () => {
+    if (!blog) return;
+    try {
+      const res = await fetch(`/api/blogs/${blog._id}/comments`);
+      if (!res.ok) throw new Error("Failed to fetch comments");
+      setComments(await res.json());
+    } catch (e) {
+      setComments([]);
+    }
+  };
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentInput.trim()) return;
+    setCommentLoading(true);
+    try {
+      const res = await fetch(`/api/blogs/${blog?._id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: commentInput }),
+      });
+      if (res.ok) {
+        setCommentInput("");
+        fetchComments();
+        if (commentInputRef.current) commentInputRef.current.value = "";
+      }
+    } finally {
+      setCommentLoading(false);
     }
   };
 
@@ -376,6 +418,48 @@ export default function BlogPage() {
               ))}
             </div>
           </div>
+
+          {/* Comments Section */}
+          <div className="px-8 pb-8">
+            <h2 className="text-2xl font-semibold mb-4">Comments</h2>
+            {session?.user ? (
+              <form onSubmit={handleCommentSubmit} className="flex gap-2 mb-6">
+                <input
+                  ref={commentInputRef}
+                  type="text"
+                  className="flex-1 border rounded-lg px-3 py-2"
+                  placeholder="Add a comment..."
+                  value={commentInput}
+                  onChange={e => setCommentInput(e.target.value)}
+                  disabled={commentLoading}
+                  maxLength={300}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                  disabled={commentLoading}
+                >
+                  {commentLoading ? "Posting..." : "Post"}
+                </button>
+              </form>
+            ) : (
+              <div className="mb-6 text-gray-500">Sign in to post a comment.</div>
+            )}
+            <div className="space-y-4">
+              {comments.length === 0 && <div className="text-gray-400">No comments yet.</div>}
+              {comments.map((c) => (
+                <div key={c._id} className="bg-gray-100 rounded-lg px-4 py-3">
+                  <div className="font-semibold text-gray-800">{c.userId?.name || "User"}</div>
+                  <div className="text-gray-700 mt-1">{c.content}</div>
+                  <div className="text-xs text-gray-400 mt-1">{new Date(c.createdAt).toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Admin Editor Placeholder */}
+          {/* TODO: Add rich text editor for admin here */}
 
           {/* Footer */}
           <div className="p-8 bg-gray-50 border-t">
