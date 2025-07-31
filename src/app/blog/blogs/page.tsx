@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface Blog {
@@ -23,20 +24,25 @@ interface Blog {
   updatedAt: string;
 }
 
-export default function PublicBlogsPage() {
-  const { data: session } = useSession();
+export default function BlogsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    fetchPublishedBlogs();
-  }, []);
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    } else if (status === "authenticated") {
+      fetchBlogs();
+    }
+  }, [status, router]);
 
-  const fetchPublishedBlogs = async () => {
+  const fetchBlogs = async () => {
     try {
-      // Fetch only published blogs
-      const response = await fetch("/api/blogs/public");
+      const response = await fetch("/api/blogs");
       if (response.ok) {
         const data = await response.json();
         setBlogs(data);
@@ -66,17 +72,37 @@ export default function PublicBlogsPage() {
     });
   };
 
-  const filteredBlogs = blogs.filter(blog => 
-    blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    blog.author?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const copyShareUrl = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      // You could add a toast notification here
+      alert('Share link copied to clipboard!');
+    } catch (error) {
+      console.error('Error copying URL:', error);
+    }
+  };
 
-  if (loading) {
+  const filteredBlogs = blogs.filter(blog => {
+    const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         blog.author?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = filter === "all" || 
+                         (filter === "published" && blog.published) ||
+                         (filter === "draft" && !blog.published);
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
+  }
+
+  if (!session) {
+    return null;
   }
 
   return (
@@ -85,59 +111,51 @@ export default function PublicBlogsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Published Blogs</h1>
-            <p className="text-gray-600 mt-1">Discover amazing content from our community</p>
+            <h1 className="text-3xl font-bold text-gray-900">My Blogs</h1>
+            <p className="text-gray-600 mt-1">Manage and view all your created blogs</p>
           </div>
-          {session ? (
-            <div className="flex gap-3 mt-4 sm:mt-0">
-              <Link
-                href="/blog/blogs"
-                className="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition"
-              >
-                My Blogs
-              </Link>
-              <Link
-                href="/app"
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-              >
-                Create Blog
-              </Link>
-            </div>
-          ) : (
-            <div className="flex gap-3 mt-4 sm:mt-0">
-              <Link
-                href="/auth/signin"
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-              >
-                Sign In
-              </Link>
-            </div>
-          )}
+          <Link
+            href="/app"
+            className="mt-4 sm:mt-0 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+          >
+            Create New Blog
+          </Link>
         </div>
 
-        {/* Search */}
-        <div className="mb-8">
-          <input
-            type="text"
-            placeholder="Search blogs by title or author..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        {/* Search and Filter */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search blogs by title or author..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Blogs</option>
+            <option value="published">Published</option>
+            <option value="draft">Drafts</option>
+          </select>
         </div>
 
         {/* Blogs Grid */}
         {filteredBlogs.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📝</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">No published blogs found</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">No blogs found</h2>
             <p className="text-gray-600 mb-6">
-              {searchTerm
-                ? "Try adjusting your search terms."
-                : "Be the first to publish a blog!"
+              {searchTerm || filter !== "all"
+                ? "Try adjusting your search terms or filters."
+                : "Create your first blog to get started!"
               }
             </p>
-            {session && !searchTerm && (
+            {!searchTerm && (
               <Link 
                 href="/app"
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
@@ -166,9 +184,11 @@ export default function PublicBlogsPage() {
                           <p className="text-sm text-gray-500">{formatDate(blog.createdAt)}</p>
                         </div>
                       </div>
-                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                        Published
-                      </span>
+                      {blog.published && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          Published
+                        </span>
+                      )}
                     </div>
                     
                     <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
@@ -196,12 +216,24 @@ export default function PublicBlogsPage() {
 
                   {/* Blog Actions */}
                   <div className="p-6">
-                    <Link
-                      href={`/blog/${blog._id}`}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
-                    >
-                      Read Blog
-                    </Link>
+                    <div className="flex items-center justify-between">
+                      <Link
+                        href={`/blog/${blog._id}`}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                      >
+                        {blog.published ? 'View Blog' : 'Edit Blog'}
+                      </Link>
+                      
+                      {blog.published && blog.shareUrl && (
+                        <button
+                          onClick={() => copyShareUrl(blog.shareUrl!)}
+                          className="text-gray-500 hover:text-gray-700 transition"
+                          title="Copy share link"
+                        >
+                          📋
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
