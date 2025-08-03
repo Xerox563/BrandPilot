@@ -7,12 +7,16 @@ interface BlogAdminEditorProps {
   isAdmin: boolean;
 }
 
-export default function BlogAdminEditor({ initialContent, onSave, isAdmin }: BlogAdminEditorProps) {
+export default function BlogAdminEditor({
+  initialContent,
+  onSave,
+  isAdmin,
+}: BlogAdminEditorProps) {
   const [saving, setSaving] = useState(false);
-  const [content, setContent] = useState(initialContent || '');
+  const [content, setContent] = useState(initialContent || "");
 
   useEffect(() => {
-    setContent(initialContent || '');
+    setContent(initialContent || "");
   }, [initialContent]);
 
   const handleSave = async () => {
@@ -24,7 +28,9 @@ export default function BlogAdminEditor({ initialContent, onSave, isAdmin }: Blo
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Edit Blog Content:</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Edit Blog Content:
+        </label>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -32,7 +38,7 @@ export default function BlogAdminEditor({ initialContent, onSave, isAdmin }: Blo
           placeholder="Edit your blog content here..."
         />
       </div>
-      
+
       <button
         onClick={handleSave}
         className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"

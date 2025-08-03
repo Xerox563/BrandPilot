@@ -15,13 +15,24 @@ BrandPilot is a full-featured blog creation platform powered by Google Gemini AI
 - **Blog Management:** View, search, and manage all your published and draft blogs.
 - **Thinking Loaders:** Visual feedback while AI processes your requests.
 
-## Features to be Addon ::
-- **Viewer Count** Curently Working on this , to know number of users read the blog .
-- **huggingface  **
-- **Linkedin Working Flow Integration:** Where users can directly share the article/blog as the post on the linkedin (Linkedin Automation)
-- **Theme Customization** Where users can customize the theme as well as the colors.
-- **Editor Menu** Where users can access the editor menu to edit the article more greatly.
-- **Image Upload addon and Instagram Automation Flow** Where users can upload image as well and share it on the instagram/Linkedin without going to instagram/Linkedin and creating the post
+## 🔧 Planned Add-ons for BrandPilot
+
+- **Viewer Count**  
+  Track how many people have read the blog with live view count and simple analytics.
+- **LinkedIn Auto-Post Flow**  
+  Directly share your blog on LinkedIn as a proper post with title, summary, and image.
+- **Theme Customizer**  
+  Users can change the blog look — like font, colors, and layout — as per their style.
+- **Advanced Editor Menu**  
+  Add tables, code blocks, AI-based rephrasing, and better text formatting tools in editor.
+- **Instagram Automation + Image Upload**  
+  Upload images and auto-post your blog on Instagram or LinkedIn with captions.
+- **AI SEO Optimizer**  
+  AI will suggest titles, keywords, and meta descriptions to make your blog Google-friendly.
+- **Tweet Thread Generator**  
+  Turn your blog into a thread with emojis, hooks, and line breaks ready to post on Twitter.
+- **Hugging Face Integration**  
+  Use Hugging Face models for AI text generation, summarization, translations, or image generation (planned).
 
 ## Tech Stack
 

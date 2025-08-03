@@ -83,8 +83,6 @@ export default function BlogPage() {
       }
       const data = await response.json();
       console.log('Fetched blog data:', data);
-      console.log('Blog content:', data.content);
-      console.log('Blog content type:', typeof data.content);
       setBlog(data);
       setLikeCount(data.likes || 0);
       // Check if current user has liked this blog
@@ -228,9 +226,7 @@ export default function BlogPage() {
       body: JSON.stringify({ content: newContent }),
     });
     if (res.ok) {
-      // Update the local blog state with new content instead of refetching
-      setBlog(prevBlog => prevBlog ? { ...prevBlog, content: newContent } : null);
-      // Keep edit mode active - don't call fetchBlog() which would reset the page
+      fetchBlog();
     }
   };
 
