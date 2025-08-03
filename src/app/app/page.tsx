@@ -27,6 +27,8 @@ export default function AppPage() {
   const [showBlog, setShowBlog] = useState(true);
   const [showRephrased, setShowRephrased] = useState(true);
   const [loading, setLoading] = useState("");
+  const [loadingMessage, setLoadingMessage] = useState("");
+  const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState("");
   const [blogTitle, setBlogTitle] = useState("");
   const [wordCount, setWordCount] = useState(200);
@@ -63,6 +65,27 @@ export default function AppPage() {
     setBlog("");
     setBlogSummary("");
     setRephrased("");
+    setLoadingStep(0);
+    
+    // AI-style loading sequence
+    const loadingSteps = [
+      "🤖 Analyzing your idea...",
+      "🧠 Processing with AI...", 
+      "📝 Generating content...",
+      "✨ Adding finishing touches...",
+      "🎯 Optimizing for engagement..."
+    ];
+    
+    const loadingInterval = setInterval(() => {
+      setLoadingStep(prev => {
+        if (prev < loadingSteps.length - 1) {
+          setLoadingMessage(loadingSteps[prev + 1]);
+          return prev + 1;
+        }
+        return prev;
+      });
+    }, 1500);
+    
     try {
       const res = await fetch("/app/api/generate-blog", {
         method: "POST",
@@ -77,7 +100,10 @@ export default function AppPage() {
     } catch (err: any) {
       setError(err.message || "Blog generation failed.");
     } finally {
+      clearInterval(loadingInterval);
       setLoading("");
+      setLoadingMessage("");
+      setLoadingStep(0);
     }
   }
 
@@ -86,6 +112,27 @@ export default function AppPage() {
     setLoading("rephrase");
     setError("");
     setRephrased("");
+    setLoadingStep(0);
+    
+    // Rephrasing loading sequence
+    const rephraseSteps = [
+      "🔄 Analyzing content...",
+      "💭 Finding alternatives...",
+      "✍️ Rewriting with AI...",
+      "🎨 Styling variations...",
+      "✨ Finalizing new version..."
+    ];
+    
+    const loadingInterval = setInterval(() => {
+      setLoadingStep(prev => {
+        if (prev < rephraseSteps.length - 1) {
+          setLoadingMessage(rephraseSteps[prev + 1]);
+          return prev + 1;
+        }
+        return prev;
+      });
+    }, 1200);
+    
     try {
       const res = await fetch("/app/api/rephrase", {
         method: "POST",
@@ -98,7 +145,10 @@ export default function AppPage() {
     } catch (err: any) {
       setError(err.message || "Rephrasing failed.");
     } finally {
+      clearInterval(loadingInterval);
       setLoading("");
+      setLoadingMessage("");
+      setLoadingStep(0);
     }
   }
 
@@ -240,7 +290,7 @@ export default function AppPage() {
                   {loading === 'blog' ? (
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Thinking...
+                      {loadingMessage || "🤖 Analyzing your idea..."}
                     </div>
                   ) : (
                     'Generate Blog'
@@ -255,7 +305,7 @@ export default function AppPage() {
                   {loading === 'rephrase' ? (
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Thinking...
+                      {loadingMessage || "🔄 Analyzing content..."}
                     </div>
                   ) : (
                     'Rephrase Blog'
@@ -291,6 +341,28 @@ export default function AppPage() {
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
                 {error}
+              </div>
+            )}
+
+            {/* AI Loading Animation */}
+            {loading && (
+              <div className="fixed inset-0 bg-gray-900/80 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-center mb-6">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mr-4"></div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">AI is working its magic...</h3>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-gray-700 dark:text-gray-300 text-lg mb-4 font-medium">{loadingMessage}</p>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4">
+                      <div 
+                        className="bg-blue-600 dark:bg-blue-400 h-3 rounded-full transition-all duration-500"
+                        style={{ width: `${((loadingStep + 1) / 5) * 100}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">Step {loadingStep + 1} of 5</p>
+                  </div>
+                </div>
               </div>
             )}
 

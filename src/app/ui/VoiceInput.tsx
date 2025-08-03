@@ -136,7 +136,7 @@ export default function VoiceInput({ onTranscript, placeholder = "Click to start
     <div className="space-y-3">
       <div className="relative">
         <textarea
-          className="w-full min-h-[120px] p-3 border rounded-xl bg-gray-50 dark:bg-gray-800 resize-none pr-12"
+          className="w-full min-h-[120px] p-3 border rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 resize-none pr-12"
           placeholder={placeholder}
           value={transcript}
           onChange={(e) => {
