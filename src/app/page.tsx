@@ -156,12 +156,12 @@ export default function Home() {
                   S
                 </div>
                 <div>
-                  <h4 className="font-semibold text-white">Sarah Johnson</h4>
+                  <h4 className="font-semibold text-white">Washeem</h4>
                   <p className="text-blue-100 text-sm">Content Creator</p>
                 </div>
               </div>
               <p className="text-blue-100 italic">
-                "BrandPilot has revolutionized my content creation. The AI generates amazing blog posts, and the multilingual feature helps me reach global audiences."
+                "BrandPilot has revolutionized my content creation. The AI generates amazing blog posts, and the multilingual feature is something extra."
               </p>
             </div>
             
@@ -171,8 +171,8 @@ export default function Home() {
                   M
                 </div>
                 <div>
-                  <h4 className="font-semibold text-white">Mike Chen</h4>
-                  <p className="text-blue-100 text-sm">Marketing Manager</p>
+                  <h4 className="font-semibold text-white">Abhishek Dixit</h4>
+                  <p className="text-blue-100 text-sm">Technology Analyst</p>
                 </div>
               </div>
               <p className="text-blue-100 italic">
@@ -186,8 +186,8 @@ export default function Home() {
                   A
                 </div>
                 <div>
-                  <h4 className="font-semibold text-white">Alex Rodriguez</h4>
-                  <p className="text-blue-100 text-sm">Blogger</p>
+                  <h4 className="font-semibold text-white">Naman</h4>
+                  <p className="text-blue-100 text-sm">Analyst</p>
                 </div>
               </div>
               <p className="text-blue-100 italic">
@@ -227,19 +227,19 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-gray-400 text-sm sm:text-base mb-4">
-              © 2024 BrandPilot. Made by Amit.
+              © 2025 BrandPilot. Made by Amit.
             </p>
             <div className="flex justify-center space-x-6">
               <a 
-                href="https://instagram.com/amit" 
+                href="https://portfolio-amit7.netlify.app/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors duration-200"
               >
-                Instagram
+                Portfolio
               </a>
               <a 
-                href="https://linkedin.com/in/amit" 
+                href="https://www.linkedin.com/in/amit-gangwar-a63174250/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors duration-200"
@@ -247,7 +247,7 @@ export default function Home() {
                 LinkedIn
               </a>
               <a 
-                href="https://github.com/amit" 
+                href="https://github.com/Xerox563" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors duration-200"
