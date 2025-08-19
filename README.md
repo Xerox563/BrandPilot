@@ -143,7 +143,7 @@ With BrandPilot, anyone can write and share great content — without switching 
 - `/app/ui` — Feature-specific UI
 - `/app/api` — API endpoints for Gemini AI
 
-## API Endpoints
+## API Endpoints [Will update soon]
 
 - `/app/api/generate-blog` — Generate blog content with summaries and tone control
 - `/app/api/repurpose` — Repurpose content for different styles and platforms
@@ -161,6 +161,3 @@ With BrandPilot, anyone can write and share great content — without switching 
 - Powered by [Google Gemini AI](https://ai.google.dev/) and HuggingFace LLM Models
 - Built with [Next.js](https://nextjs.org/),Hyper ui Components and [Tailwind CSS](https://tailwindcss.com/)
 
-## GitHub
-
-[https://github.com/YOUR_GITHUB/brandpilot](https://github.com/Xerox563/BrandPilot.git)
